@@ -1,0 +1,22 @@
+## .NET
+bin/
+obj/
+[Bb]uild/
+[Bb]uild[Ll]og.*
+
+## User-specific files
+*.user
+*.suo
+*.userprefs
+.vs/
+
+## Test results
+TestResults/
+coverage/
+
+## IDEs
+.idea/
+.vscode/
+
+## OS files
+.DS_Store

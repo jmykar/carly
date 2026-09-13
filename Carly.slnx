@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="src/Carly.Api/Carly.Api.csproj" />
+  <Project Path="tests/Carly.Api.Tests/Carly.Api.Tests.csproj" />
+</Solution>
