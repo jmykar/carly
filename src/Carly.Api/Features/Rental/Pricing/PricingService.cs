@@ -32,11 +32,11 @@ public sealed class PricingService
 
         var price = request.Category switch
         {
-            CarCategory.SmallCar => _configuration.BaseDayPrice * request.NumberOfDays,
-            CarCategory.Combi => _configuration.BaseDayPrice * request.NumberOfDays * 1.3m
-                                 + _configuration.BaseKmPrice * request.NumberOfKm,
-            CarCategory.Truck => _configuration.BaseDayPrice * request.NumberOfDays * 1.5m
-                                 + _configuration.BaseKmPrice * request.NumberOfKm * 1.5m,
+            CarCategory.SmallCar => CalculateDailyPrice(request),
+            CarCategory.Combi => CalculateDailyPrice(request) * 1.3m
+                                 + CalculateDistancePrice(request),
+            CarCategory.Truck => CalculateDailyPrice(request) * 1.5m
+                                 + CalculateDistancePrice(request) * 1.5m,
             _ => throw new ArgumentOutOfRangeException(
                 nameof(request.Category),
                 request.Category,
@@ -44,5 +44,15 @@ public sealed class PricingService
         };
 
         return new PricingResult(Math.Round(price, RoundingDigits, MidpointRounding.AwayFromZero));
+    }
+
+    private decimal CalculateDistancePrice(PricingFactor request)
+    {
+        return _configuration.BaseKmPrice * request.NumberOfKm;
+    }
+
+    private decimal CalculateDailyPrice(PricingFactor request)
+    {
+        return _configuration.BaseDayPrice * request.NumberOfDays;
     }
 }

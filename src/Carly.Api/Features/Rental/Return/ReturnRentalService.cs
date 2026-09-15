@@ -7,8 +7,7 @@ using ReturnRentalError = Carly.Api.Features.Rental.Return.Models.ReturnRentalEr
 
 namespace Carly.Api.Features.Rental.Return;
 
-
-public sealed class ReturnVehicleService(
+public sealed class ReturnRentalService(
     IRentalStore rentalStore,
     PricingService pricingService)
 {

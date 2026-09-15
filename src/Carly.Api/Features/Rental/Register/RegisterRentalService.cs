@@ -4,7 +4,7 @@ using Carly.Api.Features.Shared.Models;
 
 namespace Carly.Api.Features.Rental.Register;
 
-public sealed class RegisterVehicleService(IRentalStore rentalStore)
+public sealed class RegisterRentalService(IRentalStore rentalStore)
 {
     public RegisterRentalResult Execute(
         string bookingNumber,

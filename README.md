@@ -25,6 +25,17 @@ reading.
 Car return can be registered with `POST /api/v1/rental/{bookingNumber}/return` using
 the return date/time and odometer reading. The final price is calculated and stored.
 
+The API uses EF Core with SQLite for rental persistence. By default it creates or
+updates `carly.db` in the working directory using the checked-in migration. Set the
+`ConnectionStrings:Carly` configuration value to use another database. Development
+mode seeds three existing bookings (`BOOK-001` through `BOOK-003`); there are no
+booking or vehicle creation endpoints in this scope.
+
+## Documentation
+
+- [Rental lifecycle use cases](docs/use-cases/rental-lifecycle.md)
+- [Infrastructure decisions](docs/infra.md)
+
 ## Test
 
 ```bash

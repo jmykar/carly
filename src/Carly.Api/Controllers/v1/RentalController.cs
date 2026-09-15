@@ -11,18 +11,18 @@ namespace Carly.Api.Controllers.v1;
 [ApiController]
 [Route("api/v1/rental")]
 public sealed class RentalController(
-    RegisterVehicleService registerService,
-    ReturnVehicleService returnService) : ControllerBase
+    RegisterRentalService registerService,
+    ReturnRentalService returnService) : ControllerBase
 {
     [HttpPost("{bookingNumber}")]
     [Produces("application/json")]
-    [ProducesResponseType(typeof(RentalModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     [EndpointSummary("Register vehicle pickup")]
     [EndpointDescription("Registers the pickup of the vehicle assigned to the booking.")]
-    public ActionResult<RentalModel> Register(
+    public ActionResult<string> Register(
         string bookingNumber,
         RegisterRequest request)
     {
@@ -30,7 +30,8 @@ public sealed class RentalController(
 
         return result.Error switch
         {
-            RegisterRentalError.None => Ok(result.Rental),
+            RegisterRentalError.None => Ok(
+                $"Car {result.Rental?.RegistrationNumber} with booking number {result.Rental?.BookingNumber} has been picked up successfully."),
             RegisterRentalError.BookingNotFound => Problem(
                 statusCode: StatusCodes.Status404NotFound,
                 title: "Booking not found",
@@ -57,7 +58,7 @@ public sealed class RentalController(
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     [EndpointSummary("Register vehicle return")]
     [EndpointDescription("Registers the return of a picked-up vehicle and stores the final rental price.")]
-    public ActionResult<RentalModel> Return(
+    public ActionResult<string> Return(
         string bookingNumber,
         ReturnRequest request)
     {
@@ -65,7 +66,8 @@ public sealed class RentalController(
 
         return result.Error switch
         {
-            ReturnRentalError.None => Ok(result.Rental),
+            ReturnRentalError.None => Ok(
+                $"Car {result.Rental?.RegistrationNumber} with booking number {result.Rental?.BookingNumber} has been returned successfully. Total price: {result.Rental?.Price:C}."),
             ReturnRentalError.BookingNotFound => Problem(
                 statusCode: StatusCodes.Status404NotFound,
                 title: "Booking not found",

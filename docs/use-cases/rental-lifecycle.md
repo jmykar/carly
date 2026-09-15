@@ -9,7 +9,6 @@ This document is the living domain reference for Carly's rental use cases. It de
 | UC-01 | Register car pickup | Implemented |
 | UC-02 | Calculate rental price | Implemented |
 | UC-03 | Register returned car | Implemented |
-| TODO-01 | Replace in-memory storage with EF Core persistence | Planned |
 
 ## Goal and actors
 
@@ -139,20 +138,5 @@ The following are intentionally outside the current use cases:
 - Correcting pickup or return registrations
 - Detailed access-control rules for customer identifiers
 - UI-specific behavior
-- Choosing a production database
-
-## Future work
-
-### TODO-01 — EF Core persistence
-
-Replace `InMemoryRentalStore` with an EF Core-backed implementation when durable or shared storage is required.
-
-Acceptance criteria:
-
-- Preserve the use-case behavior and controller contracts.
-- Keep storage-specific code under `Infrastructure/`.
-- Add database configuration and migrations.
-- Run the existing business and API contract tests against the database-backed store.
-- Document the local development and test database setup.
-
-Do not start this work as part of a use-case change unless persistence is explicitly requested.
+- Durable persistence is implemented behind the existing storage contract; future
+  persistence work is limited to server-hosted or cloud databases.
