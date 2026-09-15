@@ -7,7 +7,7 @@ using Xunit;
 
 namespace Carly.Api.Tests.UnitTests;
 
-public sealed class ReturnVehicleServiceTests
+public sealed class RegisterVehicleTests
 {
     [Fact]
     public void Execute_RegistersPickupAndTransitionsRental()
@@ -15,7 +15,7 @@ public sealed class ReturnVehicleServiceTests
         var store = new InMemoryRentalStore();
         var rental = TestHelpers.CreateBookedRental("BOOK-001");
         store.Add(rental);
-        var service = new RegisterVehicleService(store);
+        var service = new RegisterRentalService(store);
         var pickupDateTime = new DateTime(2026, 9, 12, 10, 30, 0);
 
         var result = service.Execute(
@@ -32,7 +32,7 @@ public sealed class ReturnVehicleServiceTests
     [Fact]
     public void Execute_ReturnsBookingNotFoundForUnknownBooking()
     {
-        var service = new RegisterVehicleService(new InMemoryRentalStore());
+        var service = new RegisterRentalService(new InMemoryRentalStore());
 
         var result = service.Execute("UNKNOWN", ValidRequest());
 
@@ -48,7 +48,7 @@ public sealed class ReturnVehicleServiceTests
         rental.Pickup = new RegisterRecord(DateTime.UtcNow, 10000);
         store.Add(rental);
 
-        var result = new RegisterVehicleService(store).Execute("BOOK-001", ValidRequest());
+        var result = new RegisterRentalService(store).Execute("BOOK-001", ValidRequest());
 
         Assert.Equal(RegisterRentalError.AlreadyPickedUp, result.Error);
     }
@@ -59,7 +59,7 @@ public sealed class ReturnVehicleServiceTests
         var store = new InMemoryRentalStore();
         store.Add(TestHelpers.CreateBookedRental("BOOK-001"));
 
-        var result = new RegisterVehicleService(store).Execute(
+        var result = new RegisterRentalService(store).Execute(
             "BOOK-001",
             ValidRequest() with { RegistrationNumber = "XYZ999" });
 
@@ -72,7 +72,7 @@ public sealed class ReturnVehicleServiceTests
         var store = new InMemoryRentalStore();
         store.Add(TestHelpers.CreateBookedRental("BOOK-001"));
 
-        var result = new RegisterVehicleService(store).Execute(
+        var result = new RegisterRentalService(store).Execute(
             "BOOK-001",
             ValidRequest() with { Category = CarCategory.Truck });
 
@@ -82,7 +82,7 @@ public sealed class ReturnVehicleServiceTests
     [Fact]
     public void Execute_RejectsInvalidInput()
     {
-        var service = new RegisterVehicleService(new InMemoryRentalStore());
+        var service = new RegisterRentalService(new InMemoryRentalStore());
 
         var result = service.Execute(
             "BOOK-001",
@@ -97,7 +97,7 @@ public sealed class ReturnVehicleServiceTests
         var store = new InMemoryRentalStore();
         store.Add(TestHelpers.CreateBookedRental("BOOK-001"));
         var requests = Enumerable.Range(0, 4)
-            .Select(_ => Task.Run(() => new RegisterVehicleService(store).Execute(
+            .Select(_ => Task.Run(() => new RegisterRentalService(store).Execute(
                 "BOOK-001",
                 ValidRequest())))
             .ToArray();

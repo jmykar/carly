@@ -102,9 +102,9 @@ public sealed class RegisterReturnServiceTests
         Assert.Equal(ReturnRentalError.AlreadyReturned, result.Error);
     }
 
-    private ReturnVehicleService CreateService(InMemoryRentalStore store)
+    private ReturnRentalService CreateService(InMemoryRentalStore store)
     {
-        return new ReturnVehicleService(store, _pricingService);
+        return new ReturnRentalService(store, _pricingService);
     }
 
     private static InMemoryRentalStore CreatePickedUpStore()

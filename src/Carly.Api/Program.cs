@@ -3,9 +3,8 @@ using Carly.Api.Features.Rental;
 using Carly.Api.Features.Rental.Pricing;
 using Carly.Api.Features.Rental.Register;
 using Carly.Api.Features.Rental.Return;
-using Carly.Api.Features.Shared.Models;
 using Carly.Api.Infrastructure;
-using RentalModel = Carly.Api.Features.Shared.Models.Rental;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,39 +23,30 @@ builder.Services
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.Converters.Add(
-            new JsonStringEnumConverter(allowIntegerValues: false));
+        new JsonStringEnumConverter(allowIntegerValues: false));
     });
-builder.Services.AddSingleton<IRentalStore>(_ =>
-{
-    var store = new InMemoryRentalStore();
-    store.Add(new RentalModel
-    {
-        BookingNumber = "BOOK-001",
-        RegistrationNumber = "REG001",
-        Category = CarCategory.SmallCar
-    });
-    store.Add(new RentalModel
-    {
-        BookingNumber = "BOOK-002",
-        RegistrationNumber = "REG002",
-        Category = CarCategory.Combi
-    });
-    store.Add(new RentalModel
-    {
-        BookingNumber = "BOOK-003",
-        RegistrationNumber = "REG003",
-        Category = CarCategory.Truck
-    });
-    return store;
-});
-builder.Services.AddScoped<RegisterVehicleService>();
-builder.Services.AddScoped<ReturnVehicleService>();
+
+var connectionString = builder.Configuration.GetConnectionString("Carly")
+                       ?? "Data Source=carly.db";
+builder.Services.AddDbContext<CarlyDbContext>(options => options.UseSqlite(connectionString));
+builder.Services.AddScoped<IRentalStore, EfRentalStore>();
+builder.Services.AddScoped<RegisterRentalService>();
+builder.Services.AddScoped<ReturnRentalService>();
 builder.Services.AddSingleton(new PricingConfiguration(
     100m,
     2m));
 builder.Services.AddSingleton<PricingService>();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<CarlyDbContext>();
+    dbContext.Database.Migrate();
+
+    if (app.Environment.IsDevelopment())
+        DevelopmentDataSeeder.Seed(scope.ServiceProvider.GetRequiredService<IRentalStore>());
+}
 
 app.UseSwagger();   
 app.UseSwaggerUI();

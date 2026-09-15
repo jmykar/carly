@@ -14,6 +14,10 @@ obj/
 TestResults/
 coverage/
 
+## Local persistence
+*.db-shm
+*.db-wal
+
 ## IDEs
 .idea/
 .vscode/
