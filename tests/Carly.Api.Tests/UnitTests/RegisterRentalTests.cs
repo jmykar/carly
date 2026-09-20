@@ -20,12 +20,11 @@ public sealed class RegisterVehicleTests
 
         var result = service.Execute(
             "BOOK-001",
-            new RegisterRequest("ABC123", "19800101-1234", CarCategory.SmallCar, pickupDateTime, 12000));
+            new RegisterRequest(pickupDateTime, 12000));
 
         Assert.Equal(RegisterRentalError.None, result.Error);
         Assert.Same(rental, result.Rental);
         Assert.Equal(RentalStatus.PickedUp, rental.Status);
-        Assert.Equal("19800101-1234", rental.CustomerId);
         Assert.Equal(new RegisterRecord(pickupDateTime, 12000), rental.Pickup);
     }
 
@@ -52,33 +51,7 @@ public sealed class RegisterVehicleTests
 
         Assert.Equal(RegisterRentalError.AlreadyPickedUp, result.Error);
     }
-
-    [Fact]
-    public void Execute_RejectsMismatchedRegistrationNumber()
-    {
-        var store = new InMemoryRentalStore();
-        store.Add(TestHelpers.CreateBookedRental("BOOK-001"));
-
-        var result = new RegisterRentalService(store).Execute(
-            "BOOK-001",
-            ValidRequest() with { RegistrationNumber = "XYZ999" });
-
-        Assert.Equal(RegisterRentalError.RegistrationNumberMismatch, result.Error);
-    }
-
-    [Fact]
-    public void Execute_RejectsMismatchedCategory()
-    {
-        var store = new InMemoryRentalStore();
-        store.Add(TestHelpers.CreateBookedRental("BOOK-001"));
-
-        var result = new RegisterRentalService(store).Execute(
-            "BOOK-001",
-            ValidRequest() with { Category = CarCategory.Truck });
-
-        Assert.Equal(RegisterRentalError.CategoryMismatch, result.Error);
-    }
-
+    
     [Fact]
     public void Execute_RejectsInvalidInput()
     {
@@ -111,9 +84,6 @@ public sealed class RegisterVehicleTests
     private static RegisterRequest ValidRequest()
     {
         return new RegisterRequest(
-            "ABC123",
-            "19800101-1234",
-            CarCategory.SmallCar,
             new DateTime(2026, 9, 12, 10, 30, 0),
             12000);
     }

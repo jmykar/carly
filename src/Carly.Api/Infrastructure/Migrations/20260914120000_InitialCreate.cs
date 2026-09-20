@@ -1,3 +1,4 @@
+using Carly.Api.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
@@ -15,6 +16,8 @@ public partial class InitialCreate : Migration
             name: "Rentals",
             columns: table => new
             {
+                Id = table.Column<int>(type: "INTEGER", nullable: false)
+                    .Annotation("Sqlite:Autoincrement", true),
                 BookingNumber = table.Column<string>(maxLength: 100, nullable: false),
                 RegistrationNumber = table.Column<string>(maxLength: 50, nullable: false),
                 Category = table.Column<string>(nullable: false),
@@ -26,7 +29,13 @@ public partial class InitialCreate : Migration
                 ReturnOdometerKm = table.Column<int>(nullable: true),
                 Price = table.Column<decimal>(nullable: true)
             },
-            constraints: table => table.PrimaryKey("PK_Rentals", x => x.BookingNumber));
+            constraints: table => table.PrimaryKey("PK_Rentals", x => x.Id));
+
+        migrationBuilder.CreateIndex(
+            name: "IX_Rentals_BookingNumber",
+            table: "Rentals",
+            column: "BookingNumber",
+            unique: true);
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)

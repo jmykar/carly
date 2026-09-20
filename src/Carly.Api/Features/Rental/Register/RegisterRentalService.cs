@@ -11,14 +11,11 @@ public sealed class RegisterRentalService(IRentalStore rentalStore)
         RegisterRequest request)
     {
         if (string.IsNullOrWhiteSpace(bookingNumber) ||
-            string.IsNullOrWhiteSpace(request.RegistrationNumber) ||
-            string.IsNullOrWhiteSpace(request.CustomerId) ||
             request.PickupDateTime == default ||
             request.OdometerKm < 0)
             return new RegisterRentalResult(null, RegisterRentalError.InvalidInput);
 
         var rental = rentalStore.GetByBookingNumber(bookingNumber);
-
         if (rental is null) return new RegisterRentalResult(null, RegisterRentalError.BookingNotFound);
 
         lock (rental)
@@ -26,16 +23,6 @@ public sealed class RegisterRentalService(IRentalStore rentalStore)
             if (rental.Status != RentalStatus.Booked || rental.Pickup is not null)
                 return new RegisterRentalResult(null, RegisterRentalError.AlreadyPickedUp);
 
-            if (!string.Equals(
-                    rental.RegistrationNumber,
-                    request.RegistrationNumber,
-                    StringComparison.OrdinalIgnoreCase))
-                return new RegisterRentalResult(null, RegisterRentalError.RegistrationNumberMismatch);
-
-            if (rental.Category != request.Category)
-                return new RegisterRentalResult(null, RegisterRentalError.CategoryMismatch);
-
-            rental.CustomerId = request.CustomerId;
             rental.Pickup = new RegisterRecord(request.PickupDateTime, request.OdometerKm);
             rental.Status = RentalStatus.PickedUp;
             rentalStore.Update(rental);

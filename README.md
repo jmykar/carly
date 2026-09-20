@@ -25,11 +25,14 @@ reading.
 Car return can be registered with `POST /api/v1/rental/{bookingNumber}/return` using
 the return date/time and odometer reading. The final price is calculated and stored.
 
+For API testing, a simplified booking can be registered with `POST /api/v1/booking`
+using only the car category. The API generates a booking number such as `BOOK-1` and
+a registration number such as `S1`. This endpoint is testing-only.
+
 The API uses EF Core with SQLite for rental persistence. By default it creates or
-updates `carly.db` in the working directory using the checked-in migration. Set the
+updates `carly.db` in the working directory using the checked-in migrations. Set the
 `ConnectionStrings:Carly` configuration value to use another database. Development
-mode seeds three existing bookings (`BOOK-001` through `BOOK-003`); there are no
-booking or vehicle creation endpoints in this scope.
+startup does not seed bookings.
 
 ## Documentation
 

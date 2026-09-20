@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace Carly.Api.Infrastructure;
+namespace Carly.Api.Infrastructure.Persistence;
 
 public sealed class CarlyDbContext(DbContextOptions<CarlyDbContext> options) : DbContext(options)
 {
@@ -10,9 +10,8 @@ public sealed class CarlyDbContext(DbContextOptions<CarlyDbContext> options) : D
     {
         var rental = modelBuilder.Entity<RentalEntity>();
 
-        // BookingNumber uniquely identifies a rental. RegistrationNumber is a
-        // snapshot of the assigned vehicle because vehicle storage is out of scope.
-        rental.HasKey(entity => entity.BookingNumber);
+        rental.HasKey(entity => entity.Id);
+        rental.HasIndex(entity => entity.BookingNumber).IsUnique();
         rental.Property(entity => entity.BookingNumber).HasMaxLength(100);
         rental.Property(entity => entity.RegistrationNumber).HasMaxLength(50).IsRequired();
         rental.Property(entity => entity.Category).HasConversion<string>().IsRequired();
@@ -22,6 +21,7 @@ public sealed class CarlyDbContext(DbContextOptions<CarlyDbContext> options) : D
 
 public sealed class RentalEntity
 {
+    public int Id { get; set; }
     public required string BookingNumber { get; set; }
     public required string RegistrationNumber { get; set; }
     public required Features.Shared.Models.CarCategory Category { get; set; }

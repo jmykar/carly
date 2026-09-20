@@ -6,6 +6,7 @@ This document is the living domain reference for Carly's rental use cases. It de
 
 | Use case | Description | Status |
 | --- | --- | --- |
+| UC-00 | Register booking for testing | Implemented |
 | UC-01 | Register car pickup | Implemented |
 | UC-02 | Calculate rental price | Implemented |
 | UC-03 | Register returned car | Implemented |
@@ -14,7 +15,7 @@ This document is the living domain reference for Carly's rental use cases. It de
 
 Carly supports a rental agent registering vehicle pickup and return, calculating the final rental price, and storing the rental lifecycle data.
 
-The primary actor is a rental agent. Bookings and assigned vehicles are read from storage; creating them is outside the current scope.
+The primary actor is a rental agent. Bookings and assigned vehicles are read from storage during the rental lifecycle. A simplified booking-registration operation exists solely to support API testing; production booking management is outside the current scope.
 
 ## Lifecycle
 
@@ -23,6 +24,30 @@ Booked -> PickedUp -> Returned
 ```
 
 A rental has one booking number and references exactly one vehicle. A rental cannot be returned before pickup, and a completed rental cannot be picked up or returned again.
+
+## UC-00 — Register booking for testing
+
+This testing-only use case creates the minimum booking record needed to exercise the
+rental lifecycle API. It is not a general booking-management workflow.
+
+### Input
+
+- Car category
+
+### Main flow
+
+- Accept the requested car category.
+- Store a new booked rental.
+- Use the SQLite-generated integer identity as the sequence source.
+- Generate the booking number as `BOOK-{Id}`.
+- Generate the registration number as `SE {Id}`.
+- Return the generated identifiers and category.
+
+### Current API
+
+```text
+POST /api/v1/booking
+```
 
 ## UC-01 — Register car pickup
 

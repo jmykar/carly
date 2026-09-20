@@ -18,11 +18,11 @@ Carly uses EF Core with SQLite for durable local rental storage.
 - `ConnectionStrings:Carly` can override the database location.
 - EF Core migrations are checked into source control.
 - The `InitialCreate` migration is checked into source control.
-- Development startup applies migrations and `DevelopmentDataSeeder` seeds existing
-  bookings only in Development.
+- Development startup applies migrations.
+- Booking registration for API testing uses a SQLite-generated integer identity as the
+  sequence source, formatting it as `BOOK-{Id}` and `SE{Id}`.
 - Persistence tests use isolated in-memory SQLite connections.
-- `BookingNumber` is the primary key.
-- Booking and vehicle creation remain outside the current scope.
+- The generated integer `Id` is the primary key and `BookingNumber` has a unique index.
 
 ### Acceptance criteria
 
@@ -36,6 +36,6 @@ Carly uses EF Core with SQLite for durable local rental storage.
 ### Non-goals
 
 - Server-hosted or cloud databases
-- Booking or vehicle creation
+- Production booking or vehicle creation
 - API route or response-contract changes
 - Generic repository or unit-of-work abstractions

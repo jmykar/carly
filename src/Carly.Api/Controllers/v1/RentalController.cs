@@ -40,10 +40,6 @@ public sealed class RentalController(
                 statusCode: StatusCodes.Status409Conflict,
                 title: "Rental conflict",
                 detail: "The rental has already been picked up."),
-            RegisterRentalError.RegistrationNumberMismatch => Problem(
-                detail: "The registration number does not match the booking."),
-            RegisterRentalError.CategoryMismatch => Problem(
-                detail: "The car category does not match the booking."),
             RegisterRentalError.InvalidInput => Problem(
                 detail: "The pickup information is invalid."),
             _ => Problem(detail: "The pickup could not be registered.")

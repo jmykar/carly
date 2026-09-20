@@ -1,5 +1,6 @@
 using Carly.Api.Features.Rental;
 using Carly.Api.Features.Shared.Models;
+using Carly.Api.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using RentalModel = Carly.Api.Features.Shared.Models.Rental;
 
@@ -13,13 +14,17 @@ public sealed class EfRentalStore(CarlyDbContext dbContext) : IRentalStore
         return entity is null ? null : ToModel(entity);
     }
 
-    public void Add(RentalModel rental)
+    public RentalModel Add(RentalModel rental)
     {
-        dbContext.Rentals.Add(ToEntity(rental));
+        using var transaction = dbContext.Database.BeginTransaction();
+        var entity = ToEntity(rental);
+        dbContext.Rentals.Add(entity);
 
         try
         {
             dbContext.SaveChanges();
+            transaction.Commit();
+            return ToModel(entity);
         }
         catch (DbUpdateException exception)
         {

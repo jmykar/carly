@@ -4,6 +4,7 @@ using Carly.Api.Features.Rental.Pricing;
 using Carly.Api.Features.Rental.Register;
 using Carly.Api.Features.Rental.Return;
 using Carly.Api.Infrastructure;
+using Carly.Api.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -43,9 +44,6 @@ using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<CarlyDbContext>();
     dbContext.Database.Migrate();
-
-    if (app.Environment.IsDevelopment())
-        DevelopmentDataSeeder.Seed(scope.ServiceProvider.GetRequiredService<IRentalStore>());
 }
 
 app.UseSwagger();   

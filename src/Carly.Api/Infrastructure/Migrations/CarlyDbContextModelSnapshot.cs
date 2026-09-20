@@ -1,4 +1,5 @@
 using Carly.Api.Infrastructure;
+using Carly.Api.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
@@ -17,8 +18,13 @@ partial class CarlyDbContextModelSnapshot : ModelSnapshot
 
         modelBuilder.Entity("Carly.Api.Infrastructure.RentalEntity", entity =>
         {
+            entity.Property<int>("Id")
+                .ValueGeneratedOnAdd()
+                .HasColumnType("INTEGER");
+
             entity.Property<string>("BookingNumber")
                 .HasMaxLength(100)
+                .IsRequired()
                 .HasColumnType("TEXT");
 
             entity.Property<string>("CustomerId").HasColumnType("TEXT");
@@ -37,7 +43,10 @@ partial class CarlyDbContextModelSnapshot : ModelSnapshot
             entity.Property<Features.Shared.Models.RentalStatus>("Status")
                 .HasConversion<string>()
                 .HasColumnType("TEXT");
-            entity.HasKey("BookingNumber");
+            entity.HasIndex("BookingNumber")
+                .IsUnique();
+
+            entity.HasKey("Id");
             entity.ToTable("Rentals");
         });
     }

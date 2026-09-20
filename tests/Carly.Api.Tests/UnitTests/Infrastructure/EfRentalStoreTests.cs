@@ -1,5 +1,6 @@
 using Carly.Api.Features.Shared.Models;
 using Carly.Api.Infrastructure;
+using Carly.Api.Infrastructure.Persistence;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Xunit;

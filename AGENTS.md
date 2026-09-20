@@ -17,7 +17,7 @@ Booked -> Picked up -> Returned
 - Pickup records the booking number, car registration number, customer identifier, car category, pickup date/time, and pickup odometer reading. Keep the API identifier generic and avoid exposing sensitive-data semantics in names unless explicitly required.
 - Return records the booking number, return date/time, and return odometer reading, then calculates and stores the final price.
 - A rental references exactly one car and is uniquely identified by its booking number.
-- Bookings and cars are read from storage; their creation is outside the initial use-case scope. Simple test storage is acceptable.
+- Bookings and cars are read from storage during the rental lifecycle. Production booking and car creation remain outside the initial use-case scope. A deliberately limited booking-registration endpoint may be added solely to make API testing possible.
 - A rental cannot be returned before pickup, and a completed rental cannot be picked up or returned again.
 - Distance is `return odometer reading - pickup odometer reading`; reject a lower return reading.
 - Duration uses calendar days between pickup and return. Keep the exact boundary behavior explicit in tests.
@@ -35,7 +35,7 @@ Truck:     baseDayRental * numberOfDays * 1.5 + baseKmPrice * numberOfKm * 1.5
 
 The category and base rates must be changeable without changing pickup and return workflows. In the current implementation, base rates are supplied through the injected `PricingConfiguration`; do not add runtime configuration or persistence without an explicit requirement. Additional categories should be addable without duplicating lifecycle logic. Unknown categories and missing price configuration must produce clear errors.
 
-Do not expand the initial scope to correction workflows, detailed social-security-number access control, booking creation, car creation, or UI-specific behavior unless explicitly requested.
+Do not expand the initial scope to correction workflows, detailed social-security-number access control, production booking creation, car creation, or UI-specific behavior unless explicitly requested. The testing-only booking-registration use case below is an explicit exception for test setup.
 
 ## Iterative delivery plan
 
@@ -62,7 +62,17 @@ Do not implement future use cases, database persistence, UI, or speculative abst
 - If seed data is useful for local development, keep it minimal and clearly development-only. Tests should use setup helpers rather than depend on production seed data.
 - Verify solution registration, compilation, and the existing health endpoint.
 
-### Iteration 1 — Register car pickup
+### Iteration 1 — Register a booking for testing
+
+- Add a deliberately simplified, testing-only booking-registration operation under `BookingController`, using the current versioned controller and contract conventions.
+- Accept only the car category in the request. Do not expose booking number or registration number as request inputs.
+- Generate the booking number in the format `BOOK-{sequence}` and the registration number in the format `S{generated number}` when storing the booking. SQLite does not provide a standalone sequence object; an SQLite-generated integer key may be used as the sequence source, then formatted into these identifiers.
+- Store the new booking in the existing storage implementation and return the generated identifiers and category through the versioned API contract.
+- Remove development startup booking seeding completely. API tests must create the booking through the endpoint or their own setup helpers.
+- Keep this endpoint out of the production rental lifecycle semantics: it exists to support testing and is not a general booking-management workflow.
+- No dedicated automated tests are required for this testing-support use case.
+
+### Iteration 2 — Register car pickup
 
 - Retrieve the booking and its assigned vehicle from the store.
 - Validate that the booking exists, has one vehicle, and has not already been picked up.
@@ -70,14 +80,14 @@ Do not implement future use cases, database persistence, UI, or speculative abst
 - Transition the rental to `Picked up`.
 - Test successful pickup and invalid booking, mismatched vehicle, duplicate pickup, missing data, invalid date/time, and invalid odometer cases.
 
-### Iteration 2 — Rental price calculation
+### Iteration 3 — Rental price calculation
 
 - Define the pricing input and result models.
 - Implement category-specific pricing in a pricing service independent of HTTP and storage.
 - Test Small car, Combi, and Truck calculations, configurable base rates, unknown categories, and the agreed rounding precision.
 - Keep the currency neutral unless a later requirement introduces a currency contract.
 
-### Iteration 3 — Register returned car
+### Iteration 4 — Register returned car
 
 - Retrieve the rental by booking number and its stored pickup record.
 - Validate that the booking exists, has been picked up, has not already been returned, and has a valid return date/time.
