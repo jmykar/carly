@@ -4,6 +4,11 @@
 
 Carly is a small C#/.NET monorepo. Keep changes focused on the current use case and preserve the deliberately simple structure.
 
+## Current delivery scope
+
+The active work is defined in [`docs/phase-03-ui-api-integration.md`](docs/phase-03-ui-api-integration.md).
+Do not expand beyond that phase unless explicitly requested.
+
 The initial domain scope is Rental Lifecycle Management: registering a car pickup, registering a returned car, and calculating the final rental price.
 
 ## Domain use cases
